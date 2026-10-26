@@ -1,0 +1,19 @@
+# Copy this file to  C:\Users\<you>\.dbt\profiles.yml  and fill in your values.
+# Do NOT commit the real profiles.yml (it is in .gitignore).
+
+dbt_demo:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: myorg-myaccount          # identifier only, no .snowflakecomputing.com
+      user: DBT_DEV_USER                # or your trial login user
+      role: DBT_DEMO_ROLE
+      warehouse: DBT_DEMO_WH
+      database: DEMO_DB
+      schema: DBT_DEV                   # objects land in DBT_DEV_RAW, DBT_DEV_STAGING, DBT_DEV_CORE, DBT_DEV_AUDIT
+      threads: 4
+      authenticator: snowflake_jwt      # key-pair auth (setup/01_snowflake_setup.sql)
+      private_key_path: C:\Users\<you>\.ssh\snowflake\rsa_key.p8
+      private_key_passphrase: "{{ env_var('SNOWFLAKE_KEY_PASSPHRASE') }}"
+      query_tag: dbt_demo

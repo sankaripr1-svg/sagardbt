@@ -1,0 +1,87 @@
+name: dbt_demo
+version: "1.0.0"
+config-version: 2
+
+profile: dbt_demo
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Patients demo: false = batch 1 only; true = batch 1 + batch 2
+  load_batch2: false
+  # Encounters practice: 1 = day-1 file only; 2 = day-1 + day-2 files
+  #   dbt build --vars "{load_day: 2}"
+  load_day: 1
+  # Incremental look-back window used in fct_encounters (Scenario B3)
+  incremental_lookback_hours: 3
+
+seeds:
+  dbt_demo:
+    +quote_columns: false
+
+    raw:
+      # Landing layer: every column loaded as text. Typing happens in staging.
+      +schema: raw
+      raw_patients:
+        +column_types: &patient_cols
+          record_id: varchar
+          patient_id: varchar
+          first_name: varchar
+          last_name: varchar
+          dob: varchar
+          gender: varchar
+          email: varchar
+          phone: varchar
+          city: varchar
+          state: varchar
+          zip: varchar
+          load_ts: varchar
+      raw_patients_batch2:
+        +column_types: *patient_cols
+      raw_encounters:
+        +column_types: &encounter_cols
+          encounter_id: varchar
+          patient_id: varchar
+          provider_id: varchar
+          encounter_type: varchar
+          admit_date: varchar
+          discharge_date: varchar
+          diagnosis_code: varchar
+          charge_amount: varchar
+          status: varchar
+          updated_at: varchar
+      raw_encounters_day2:
+        +column_types: *encounter_cols
+      raw_providers:
+        +column_types:
+          provider_id: varchar
+          provider_name: varchar
+          specialty: varchar
+          npi: varchar
+          active_flag: varchar
+
+    reference:
+      # Small, clean lookup tables (types inferred)
+      +schema: reference
+
+models:
+  dbt_demo:
+    staging:
+      +schema: staging
+      +materialized: table
+      encounters:
+        +materialized: view
+    intermediate:
+      +materialized: ephemeral
+    marts:
+      +schema: marts
+      +materialized: table
+    audit:
+      +schema: audit
+      +materialized: view

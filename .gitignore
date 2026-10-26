@@ -1,0 +1,26 @@
+# Python / virtual environment
+.venv/
+__pycache__/
+
+# dbt artifacts
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# Credentials - never commit
+profiles.yml
+!ci/profiles.yml
+*.p8
+*.pem
+*.pub
+.env
+
+# Editor / OS
+.vscode/settings.json
+.DS_Store
+Thumbs.db
+
+# Local practice databases
+*.duckdb
+*.duckdb.wal
